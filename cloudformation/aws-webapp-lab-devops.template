@@ -77,7 +77,7 @@
     },
 
     "AWSRegionVirt2AMI": {
-      "us-east-1": {"HVM": "ami-8fcee4e5"},
+      "us-east-1": {"HVM": "ami-8fcee4e5"}
     }
   },
 
