@@ -55,7 +55,7 @@
 
   "Mappings" : {
     "VPCIpSpace" : {
-      "us-east-1" : {"RANGE" : "10.42"},
+      "us-east-1" : {"RANGE" : "10.42"}
     },
 
     "instancesTypes" : {
