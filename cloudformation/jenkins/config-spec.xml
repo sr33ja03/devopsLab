@@ -31,7 +31,7 @@
   <builders>
     <hudson.tasks.Shell>
       <command>cp ../*.sh .
-./serverspec-tests.sh STACKNAME REGION beta</command>
+./serverspec-tests.sh STACKNAME REGION Beta</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

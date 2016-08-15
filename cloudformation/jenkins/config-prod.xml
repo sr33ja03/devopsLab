@@ -31,7 +31,7 @@
   <builders>
     <hudson.tasks.Shell>
       <command>cp ../*.sh .
-./cfn-update-webappstack.sh STACKNAME REGION prod</command>
+./cfn-update-webappstack.sh STACKNAME REGION Prod</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

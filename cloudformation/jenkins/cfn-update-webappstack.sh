@@ -13,7 +13,7 @@ aws cloudformation validate-template \
 
 echo "Updating WebAppStack"
 
-WebAppStack="$(aws cloudformation describe-stacks --stack-name $stackname --region $region --output text --query 'Stacks[0].Outputs[?OutputKey==`WebAppStack$envtype`].OutputValue')"
+WebAppStack="$(aws cloudformation describe-stacks --stack-name $stackname --region $region --output text --query "Stacks[0].Outputs[?OutputKey=='WebAppStack$envtype'].OutputValue")"
 AppName="$(aws cloudformation describe-stacks --stack-name $stackname --region $region --output text --query 'Stacks[0].Outputs[?OutputKey==`AppName`].OutputValue')"
 KeyName="$(aws cloudformation describe-stacks --stack-name $stackname --region $region --output text --query 'Stacks[0].Outputs[?OutputKey==`KeyName`].OutputValue')"
 VpcId="$(aws cloudformation describe-stacks --stack-name $stackname --region $region --output text --query 'Stacks[0].Outputs[?OutputKey==`VpcId`].OutputValue')"
@@ -24,7 +24,7 @@ aws cloudformation update-stack \
     --stack-name $WebAppStack \
     --region $region \
     --capabilities CAPABILITY_IAM \
-    --template-body file://cloudformation/aws-webapps-summitsp.template \
+    --template-body file://cloudformation/aws-webapp-lab-devops.template \
     --parameters ParameterKey=KeyName,ParameterValue=$KeyName \
         ParameterKey=AppName,ParameterValue=$AppName \
         ParameterKey=EnvType,ParameterValue=$envtype \
