@@ -6,7 +6,7 @@
   <properties/>
   <scm class="com.amazonaws.codepipeline.jenkinsplugin.AWSCodePipelineSCM" plugin="aws-codepipeline@0.13">
     <clearWorkspace>true</clearWorkspace>
-    <projectName>APPNAME-infraprod</projectName>
+    <projectName>APPNAME-spec</projectName>
     <actionTypeCategory>Build</actionTypeCategory>
     <actionTypeProvider>APPNAME-Jenkins</actionTypeProvider>
     <actionTypeVersion>1</actionTypeVersion>
@@ -31,7 +31,7 @@
   <builders>
     <hudson.tasks.Shell>
       <command>cp ../*.sh .
-./cfn-update-webappstack.sh STACKNAME REGION prod</command>
+./serverspec-tests.sh STACKNAME REGION beta</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

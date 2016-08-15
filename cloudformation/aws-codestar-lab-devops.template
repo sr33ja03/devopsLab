@@ -363,16 +363,16 @@
                 "source": "https://raw.githubusercontent.com/ggallego/lab-devops-infraascode/master/cloudformation/jenkins/config.xml",
                 "mode" : "644"
               },
-              "/tmp/config-infrabeta.xml" : {
-                "source" : "https://raw.githubusercontent.com/ggallego/lab-devops-infraascode/master/cloudformation/jenkins/config-infrabeta.xml",
+              "/tmp/config-beta.xml" : {
+                "source" : "https://raw.githubusercontent.com/ggallego/lab-devops-infraascode/master/cloudformation/jenkins/config-beta.xml",
                 "mode" : "644"
               },
-              "/tmp/config-infraprod.xml" : {
-                "source" : "https://raw.githubusercontent.com/ggallego/lab-devops-infraascode/master/cloudformation/jenkins/config-infraprod.xml",
+              "/tmp/config-prod.xml" : {
+                "source" : "https://raw.githubusercontent.com/ggallego/lab-devops-infraascode/master/cloudformation/jenkins/config-prod.xml",
                 "mode" : "644"
               },
-              "/tmp/config-sspec.xml" : {
-                "source" : "https://raw.githubusercontent.com/ggallego/lab-devops-infraascode/master/cloudformation/jenkins/config-sspec.xml",
+              "/tmp/config-spec.xml" : {
+                "source" : "https://raw.githubusercontent.com/ggallego/lab-devops-infraascode/master/cloudformation/jenkins/config-spec.xml",
                 "mode" : "644"
               },
               "/tmp/cfn-update-webappstack.sh" : {
@@ -462,45 +462,45 @@
                 "/usr/bin/java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 create-job ", {"Ref" : "AppName"} ,"< /tmp/config.xml\n",
                 "rm /tmp/config.xml\n",
 
-                "# configure infrabeta job\n",
-                "/bin/sed -i \"s/APPNAME/",{"Ref" : "AppName"},"/g\" /tmp/config-infrabeta.xml\n",
-                "/bin/sed -i \"s/STACKNAME/",{ "Ref": "AWS::StackName" },"/g\" /tmp/config-infrabeta.xml\n",
-                "/bin/sed -i \"s/REGION/",{"Ref": "AWS::Region"},"/g\" /tmp/config-infrabeta.xml\n",
-                "/usr/bin/java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 create-job ", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-infrabeta"]]} ,"< /tmp/config-infrabeta.xml\n",
-                "rm /tmp/config-infrabeta.xml\n",
+                "# configure infrastructure beta job\n",
+                "/bin/sed -i \"s/APPNAME/",{"Ref" : "AppName"},"/g\" /tmp/config-beta.xml\n",
+                "/bin/sed -i \"s/STACKNAME/",{ "Ref": "AWS::StackName" },"/g\" /tmp/config-beta.xml\n",
+                "/bin/sed -i \"s/REGION/",{"Ref": "AWS::Region"},"/g\" /tmp/config-beta.xml\n",
+                "/usr/bin/java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 create-job ", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-beta"]]} ,"< /tmp/config-beta.xml\n",
+                "rm /tmp/config-beta.xml\n",
 
-                "# configure infraprod job\n",
-                "/bin/sed -i \"s/APPNAME/",{"Ref" : "AppName"},"/g\" /tmp/config-infraprod.xml\n",
-                "/bin/sed -i \"s/STACKNAME/",{ "Ref": "AWS::StackName" },"/g\" /tmp/config-infraprod.xml\n",
-                "/bin/sed -i \"s/REGION/",{"Ref": "AWS::Region"},"/g\" /tmp/config-infraprod.xml\n",
-                "/usr/bin/java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 create-job ", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-infraprod"]]} ,"< /tmp/config-infraprod.xml\n",
-                "rm /tmp/config-infraprod.xml\n",
+                "# configure infrastructure prod job\n",
+                "/bin/sed -i \"s/APPNAME/",{"Ref" : "AppName"},"/g\" /tmp/config-prod.xml\n",
+                "/bin/sed -i \"s/STACKNAME/",{ "Ref": "AWS::StackName" },"/g\" /tmp/config-prod.xml\n",
+                "/bin/sed -i \"s/REGION/",{"Ref": "AWS::Region"},"/g\" /tmp/config-prod.xml\n",
+                "/usr/bin/java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 create-job ", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-prod"]]} ,"< /tmp/config-prod.xml\n",
+                "rm /tmp/config-prod.xml\n",
 
                 "# configure update infrastructure scripts\n",
-                "cp /tmp/cfn-update-webappstack.sh /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-infrabeta"]]} ,"\n",
-                "chown jenkins:jenkins /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-infrabeta"]]} ,"/cfn-update-webappstack.sh\n",
-                "cp /tmp/cfn-update-webappstack.sh /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-infraprod"]]} ,"\n",
-                "chown jenkins:jenkins /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-infraprod"]]} ,"/cfn-update-webappstack.sh\n",
+                "cp /tmp/cfn-update-webappstack.sh /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-beta"]]} ,"\n",
+                "chown jenkins:jenkins /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-beta"]]} ,"/cfn-update-webappstack.sh\n",
+                "cp /tmp/cfn-update-webappstack.sh /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-prod"]]} ,"\n",
+                "chown jenkins:jenkins /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-prod"]]} ,"/cfn-update-webappstack.sh\n",
                 "rm /tmp/cfn-update-webappstack.sh\n",
-                "cp /tmp/cfn-wait-for-stack.sh /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-infrabeta"]]} ,"\n",
-                "chown jenkins:jenkins /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-infrabeta"]]} ,"/cfn-wait-for-stack.sh\n",
-                "cp /tmp/cfn-wait-for-stack.sh /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-infraprod"]]} ,"\n",
-                "chown jenkins:jenkins /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-infraprod"]]} ,"/cfn-wait-for-stack.sh\n",
+                "cp /tmp/cfn-wait-for-stack.sh /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-beta"]]} ,"\n",
+                "chown jenkins:jenkins /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-beta"]]} ,"/cfn-wait-for-stack.sh\n",
+                "cp /tmp/cfn-wait-for-stack.sh /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-prod"]]} ,"\n",
+                "chown jenkins:jenkins /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-prod"]]} ,"/cfn-wait-for-stack.sh\n",
                 "rm /tmp/cfn-wait-for-stack.sh\n",
 
                 "# install serverspec\n",
                 "gem install rspec aws-sdk\n",
 
                 "# configure our serverspec job\n",
-                "/bin/sed -i \"s/APPNAME/",{"Ref" : "AppName"},"/g\" /tmp/config-sspec.xml\n",
-                "/bin/sed -i \"s/STACKNAME/",{ "Ref": "AWS::StackName" },"/g\" /tmp/config-sspec.xml\n",
-                "/bin/sed -i \"s/REGION/",{"Ref": "AWS::Region"},"/g\" /tmp/config-sspec.xml\n",
-                "/usr/bin/java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 create-job ", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-sspec"]]} ,"< /tmp/config-sspec.xml\n",
-                "rm /tmp/config-sspec.xml\n",
+                "/bin/sed -i \"s/APPNAME/",{"Ref" : "AppName"},"/g\" /tmp/config-spec.xml\n",
+                "/bin/sed -i \"s/STACKNAME/",{ "Ref": "AWS::StackName" },"/g\" /tmp/config-spec.xml\n",
+                "/bin/sed -i \"s/REGION/",{"Ref": "AWS::Region"},"/g\" /tmp/config-spec.xml\n",
+                "/usr/bin/java -jar /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 create-job ", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-spec"]]} ,"< /tmp/config-spec.xml\n",
+                "rm /tmp/config-spec.xml\n",
 
                 "# configure our serverspec scripts\n",
-                "cp /tmp/serverspec-tests.sh /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-sspec"]]} ,"\n",
-                "chown jenkins:jenkins /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-sspec"]]} ,"/serverspec-tests.sh\n",
+                "cp /tmp/serverspec-tests.sh /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-spec"]]} ,"\n",
+                "chown jenkins:jenkins /var/lib/jenkins/jobs/", {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-spec"]]} ,"/serverspec-tests.sh\n",
                 "rm /tmp/serverspec-tests.sh\n",
 
                 "# Set up port forwarding\n",
@@ -784,7 +784,7 @@
                   }
                 ],
                 "Configuration": {
-                  "ProjectName": {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-infrabeta"]]}
+                  "ProjectName": {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-beta"]]}
                 },
                   "RunOrder": 1
               }
@@ -836,7 +836,7 @@
                   }
                 ],
                 "Configuration": {
-                  "ProjectName": {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-sspec"]]}
+                  "ProjectName": {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-spec"]]}
                 },
                   "RunOrder": 1
               }
@@ -864,7 +864,7 @@
                   }
                 ],
                 "Configuration": {
-                  "ProjectName": {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-infraprod"]]}
+                  "ProjectName": {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-prod"]]}
                 },
                   "RunOrder": 1
               }
