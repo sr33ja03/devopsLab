@@ -429,9 +429,9 @@
 
                 "# Install Maven\n",
                 "cd /tmp/\n",
-                "wget http://mirror.cogentco.com/pub/apache/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.tar.gz\n",
-                "tar xzvf apache-maven-3.3.3-bin.tar.gz -C /opt/\n",
-                "rm /tmp/apache-maven-3.3.3-bin.tar.gz\n",
+                "wget http://mirror.cogentco.com/pub/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz\n",
+                "tar xzvf apache-maven-3.3.9-bin.tar.gz -C /opt/\n",
+                "rm /tmp/apache-maven-3.3.9-bin.tar.gz\n",
 
                 "# Install Jenkins\n",
                 "wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo\n",
