@@ -9,7 +9,7 @@ echo "Checking if WebAppStack is valid"
 
 aws cloudformation validate-template \
     --region $region \
-    --template-body file://cloudformation/aws-webapps-summitsp.template
+    --template-body file://cloudformation/aws-webapp-lab-devops.template
 
 echo "Updating WebAppStack"
 
