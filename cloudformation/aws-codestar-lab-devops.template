@@ -429,7 +429,7 @@
 
                 "# Install Maven\n",
                 "cd /tmp/\n",
-                "wget http://mirror.cogentco.com/pub/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz\n",
+                "wget https://s3.amazonaws.com/glauberg-public-do-not-delete/lab-devops-infraascode/binaries/apache-maven-3.3.9-bin.tar.gz\n",
                 "tar xzvf apache-maven-3.3.9-bin.tar.gz -C /opt/\n",
                 "rm /tmp/apache-maven-3.3.9-bin.tar.gz\n",
 
