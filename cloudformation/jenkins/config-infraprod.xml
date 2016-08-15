@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="com.amazonaws.codepipeline.jenkinsplugin.AWSCodePipelineSCM" plugin="aws-codepipeline@0.13">
+    <clearWorkspace>true</clearWorkspace>
+    <projectName>APPNAME-infraprod</projectName>
+    <actionTypeCategory>Build</actionTypeCategory>
+    <actionTypeProvider>APPNAME-Jenkins</actionTypeProvider>
+    <actionTypeVersion>1</actionTypeVersion>
+    <region>REGION</region>
+    <awsAccessKey></awsAccessKey>
+    <awsSecretKey></awsSecretKey>
+    <proxyHost></proxyHost>
+    <proxyPort>0</proxyPort>
+    <awsClientFactory/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <hudson.triggers.SCMTrigger>
+      <spec>* * * * *</spec>
+      <ignorePostCommitHooks>false</ignorePostCommitHooks>
+    </hudson.triggers.SCMTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>cp ../*.sh .
+./cfn-update-webappstack.sh STACKNAME REGION prod</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <com.amazonaws.codepipeline.jenkinsplugin.AWSCodePipelinePublisher plugin="aws-codepipeline@0.13">
+      <outputArtifacts>
+        <com.amazonaws.codepipeline.jenkinsplugin.OutputArtifact>
+          <location></location>
+        </com.amazonaws.codepipeline.jenkinsplugin.OutputArtifact>
+      </outputArtifacts>
+      <awsClientFactory/>
+    </com.amazonaws.codepipeline.jenkinsplugin.AWSCodePipelinePublisher>
+  </publishers>
+  <buildWrappers/>
+</project>  

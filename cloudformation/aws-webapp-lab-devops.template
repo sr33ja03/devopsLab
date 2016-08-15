@@ -1,0 +1,241 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description" : "Builds 2 EC2 instances for CodeDeploy (nested stack).",
+
+  "Parameters" : {
+    "KeyName" : {
+      "Description" : "Name of an existing EC2 KeyPair for SSH access to the instances.",
+      "Type" : "AWS::EC2::KeyPair::KeyName"
+    },
+
+    "AppName": {
+      "Type" : "String",
+      "Description" : "Name of the application.",
+      "MinLength": "2",
+      "MaxLength": "15",
+      "Default" : "app-name",
+      "AllowedPattern" : "[a-z0-9][-. a-z0-9]*",
+      "ConstraintDescription": "Must be between 2 and 15 characters long, lowercase and may contain alphanumeric characters, hyphens (-), and dots (.), but must start with alphanumeric."
+    },
+
+    "EnvType": {
+      "Type" : "String",
+      "Default" : "Beta",
+      "AllowedValues" : ["Beta", "Prod"],
+      "Description" : "Environment Type of your application"
+    },
+
+    "VpcId": {
+      "Description" : "VPC Id to launch your instances",
+      "Type": "AWS::EC2::VPC::Id"
+      },
+
+    "PublicSubnetA": {
+      "Description" : "Public Subnet in AZ A to launch your instances",
+      "Type": "AWS::EC2::Subnet::Id"
+    }
+
+  },
+
+  "Metadata" : {
+    "AWS::CloudFormation::Interface" : {
+      "ParameterGroups" : [
+        {
+          "Label" : { "default" : "Application" },
+          "Parameters" : [ "AppName", "EnvType" ]
+        },
+        {
+          "Label" : { "default" : "SSH & Subnet Configuration" },
+          "Parameters" : [ "KeyName", "VpcId", "PublicSubnetA" ]
+        }
+      ]
+    }
+  },
+
+  "Mappings" : {
+    "VPCIpSpace" : {
+      "us-east-1" : {"RANGE" : "10.42"},
+    },
+
+    "instancesTypes" : {
+      "WebAppInstanceType" : { "INST" : "t2.small" }
+    },
+
+    "AWSInstanceType2Virt": {
+      "t2.micro": {"Virt": "HVM"},
+      "t2.small": {"Virt": "HVM"},
+      "t2.medium": {"Virt": "HVM"},
+      "t2.large": {"Virt": "HVM"}
+    },
+
+    "AWSInstanceType2EBSOpt": {
+      "t2.micro": {"EBSOpt": "false"},
+      "t2.small": {"EBSOpt": "false"},
+      "t2.medium": {"EBSOpt": "false"},
+      "t2.large": {"EBSOpt": "false"}
+    },
+
+    "AWSRegionVirt2AMI": {
+      "us-east-1": {"HVM": "ami-8fcee4e5"},
+    }
+  },
+
+  "Resources" : {
+    "WebAppRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "ManagedPolicyArns" : [ "arn:aws:iam::aws:policy/AWSCodeDeployReadOnlyAccess", "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess" ],
+        "Path": "/"
+      }
+    },
+
+    "WebAppRolePolicies": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "BackendRole",
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Effect":"Allow",
+              "Action":"cloudformation:DescribeStackResources",
+              "Resource" : [
+                { "Fn::Join" : ["", [ "arn:aws:cloudformation:", { "Ref" : "AWS::Region" }, ":", {"Ref":"AWS::AccountId"}, ":stack/", { "Ref": "AWS::StackName" }, "/*"]]}
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "autoscaling:Describe*",
+                "autoscaling:EnterStandby",
+                "autoscaling:ExitStandby",
+                "autoscaling:UpdateAutoScalingGroup"
+              ],
+              "Resource" : "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ec2:DescribeInstances",
+                "ec2:DescribeInstanceStatus"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "elasticloadbalancing:Describe*",
+                "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+                "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
+              ],
+              "Resource" : "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:Get*",
+                "s3:List*"
+              ],
+              "Resource": [
+                { "Fn::Join" : ["", [ "arn:aws:s3:::lab-devops-", { "Ref": "AWS::Region" } , "-", {"Ref" : "AWS::AccountId"}, "-", {"Ref" : "AppName"} ]] },
+                { "Fn::Join" : ["", [ "arn:aws:s3:::lab-devops-", { "Ref": "AWS::Region" } , "-", {"Ref" : "AWS::AccountId"}, "-", {"Ref" : "AppName"}, "/*" ]] }
+              ]
+            }
+          ]
+        },
+        "Roles": [{"Ref": "WebAppRole"}]
+      }
+    },
+
+    "WebAppInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [{"Ref": "WebAppRole"}]
+      }
+    },
+
+
+    "WebAppSG" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Enable HTTP access on port 80",
+        "VpcId" : { "Ref" : "VpcId" },
+        "SecurityGroupIngress" : [ 
+          { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Fn::Join": [ "", [{ "Fn::FindInMap" : [ "VPCIpSpace", {"Ref": "AWS::Region"}, "RANGE" ]}, ".", "0.0/16"]]}},
+          { "IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"}
+        ],
+        "SecurityGroupEgress" : [
+          { "IpProtocol" : "tcp", "FromPort" : "80",  "ToPort" : "80",  "CidrIp" : "0.0.0.0/0" },
+          { "IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : "0.0.0.0/0" },
+          { "IpProtocol" : "udp", "FromPort" : "123", "ToPort" : "123", "CidrIp" : "0.0.0.0/0" },
+          { "IpProtocol" : "udp", "FromPort" : "9418", "ToPort" : "9418", "CidrIp" : "0.0.0.0/0" },
+          { "IpProtocol" : "icmp", "FromPort" : "-1",  "ToPort" : "-1",  "CidrIp" : "0.0.0.0/0" }
+        ],
+        "Tags" : [
+          {"Key" : "Name", "Value" : "WebAppSG" }
+        ]
+      }
+    },
+
+    "WebAppInstance" : {
+      "Type" : "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId" : { "Fn::FindInMap" : [ "AWSRegionVirt2AMI", { "Ref" : "AWS::Region" }, {"Fn::FindInMap": ["AWSInstanceType2Virt", { "Fn::FindInMap" : [ "instancesTypes", "WebAppInstanceType", "INST" ]}, "Virt"]} ]},
+        "InstanceType" : { "Fn::FindInMap" : [ "instancesTypes", "WebAppInstanceType", "INST" ]},
+        "EbsOptimized" : {"Fn::FindInMap": ["AWSInstanceType2EBSOpt", { "Fn::FindInMap" : [ "instancesTypes", "WebAppInstanceType", "INST" ]}, "EBSOpt"]},
+        "KeyName" : { "Ref" : "KeyName" },
+        "IamInstanceProfile" : {"Ref":"WebAppInstanceProfile"},
+        "NetworkInterfaces" : [{
+          "SubnetId" : { "Ref" : "PublicSubnetA" },
+          "GroupSet" : [{ "Ref" : "WebAppSG" }],
+          "AssociatePublicIpAddress" : "true",
+          "DeviceIndex" : "0"
+        }],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [ "", [ "#!/bin/bash -ex\n",
+                "yum install -y aws-cli\n",
+                "cd /home/ec2-user/\n",
+                "wget https://aws-codedeploy-",{ "Ref": "AWS::Region" },".s3.amazonaws.com/latest/codedeploy-agent.noarch.rpm\n",
+                "yum -y install codedeploy-agent.noarch.rpm\n",
+                "service codedeploy-agent start\n",
+                "\n"
+              ]
+            ]
+          }
+        },
+        "Tags" : [
+          {"Key" : "Environment", "Value" : {"Fn::Join" : ["", [{"Ref" : "AppName"}, "-WebApp", {"Ref" : "EnvType"}]]}},
+          {"Key" : "Name", "Value" : {"Fn::Join" : ["", ["WebApp", {"Ref" : "EnvType"}]]} }
+        ]
+      }
+    }
+  },
+
+  "Outputs" : {
+    "WebAppInstanceID" : {
+      "Value" : {"Ref": "WebAppInstance"},
+      "Description" : "WebApp Instance ID"
+    },
+
+    "WebAppPublicIP" : {
+      "Value" : { "Fn::GetAtt" : [ "WebAppInstance", "PublicIp" ] },
+      "Description" : "WebApp Public IP Address"
+    }
+
+  }
+
+}
