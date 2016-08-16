@@ -66,7 +66,7 @@
       <div class="alert alert-dismissible alert-warning">
         <button type="button" class="close" data-dismiss="alert">×</button>
         <h1>Grand Opening!</h1>
-        <p>To celebrate our grand opening, this week only all suits are <b>30% off</b> and include <b>free shipping!</b></p>
+        <p>To celebrate our grand opening, this week only all suits are <b>25% off</b> and include <b>free shipping!</b></p>
       </div>
     <% } %>
     <div class="jumbotron">
